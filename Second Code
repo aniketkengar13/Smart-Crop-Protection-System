@@ -1,0 +1,83 @@
+#include <xc.h>
+#include <stdio.h>
+#include "lcd.h"
+#include "gsm.h"
+#include "pir.h"
+#include "buzzer.h"
+
+// Configuration bits
+
+// Internal oscillator
+#pragma config FOSC = INTRCIO 
+
+// Watchdog Timer disabled
+#pragma config WDTE = OFF   
+
+ // Power-up Timer disabled
+#pragma config PWRTE = OFF    
+
+// MCLR pin function is digital I/O
+#pragma config MCLRE = OFF     
+
+
+// Define frequency for delay
+#define _XTAL_FREQ 4000000 
+
+void main(void) {
+    // Initialize peripherals
+
+
+ // Initialize LCD
+    lcd_init();     
+
+
+// Initialize GSM module
+    gsm_init();         
+
+ // Initialize PIR sensor
+    pir_init();        
+
+
+ // Initialize Buzzer
+    buzzer_init();     
+
+    while (1) {
+
+
+        if (pir_detected())
+// Check if motion is detected
+
+{ 
+
+// Display message on LCD
+            lcd_print("Animal Detected!"); 
+
+// Activate buzzer
+            buzzer_on();    
+
+// Keep buzzer on for 1 second
+            __delay_ms(1000); 
+            
+            // Send alert SMS to farmer
+            gsm_send_sms("Alert:  detected !");
+
+
+// Update LCD with alert status
+            lcd_print("Alert Sent!"); 
+
+
+// Wait for 5 seconds before checking again
+            __delay_ms(5000);  
+
+
+// Deactivate buzzer
+            buzzer_off();     
+
+// Clear LCD for next message
+            lcd_clear();       
+        }
+
+// Short delay to avoid rapid looping
+        __delay_ms(100); 
+    }
+}
