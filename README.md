@@ -1,4 +1,4 @@
-### Summary: Smart Crop Protection System
+### Smart Crop Protection System
 
 The **Smart Crop Protection System** is an automated solution designed to protect agricultural fields from potential threats such as intruders, animals, or environmental factors using sensors and electronic components. The system leverages a **PIC microcontroller** as the core processor, interfacing with various sensors, a GSM module, and alert mechanisms to monitor and safeguard crops effectively.
 
