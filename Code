@@ -1,0 +1,193 @@
+#include <pic.h>
+
+// Configuration Bits
+// Use your own config based on your hardware
+__CONFIG(0x1F7A);  
+
+// Define the ports/pins for sensors
+
+// connected to PORTB pin RB0
+#define PIR_SENSOR RB0  
+
+// connected to PORTB pin RB1
+#define SOUND_SENSOR RB1  
+
+//  connected to PORTB pin RB2
+#define IR_SENSOR RB2  
+
+//  to PORTC pin RC0
+#define BUZZER RC0  
+
+//  connected to PORTC pin RC1
+#define LASER DIODE RC1  
+
+// Define the GSM module interface (TX and RX)
+
+// UART TX for GSM
+#define GSM_TX RC6
+
+// UART RX for GSM  
+#define GSM_RX RC7  
+
+// Function Prototypes
+// Initialize system function
+void init_system();   
+
+// UART initialization
+void init_uart();   
+
+// Function to send SMS through GSM module
+void send_sms(char* message);  
+
+// LCD initialization
+void lcd_init(); 
+
+// Write data to LCD
+void lcd_write(char *str);  
+
+// Check sensors
+void sensor_check();  
+
+// Delay function
+void delay_ms(unsigned int ms);  
+
+void main() {
+
+     // Initialize all systems
+    init_system();  
+
+    // Initialize LCD display
+    lcd_init();  
+
+    while (1)
+     {
+
+     // Monitor sensors for any activity
+        sensor_check(); 
+
+    }
+}
+
+void init_system() {
+
+     // PIR sensor as input
+    TRISB0 = 1;  
+
+  // Sound sensor as input
+    TRISB1 = 1;  
+
+    // IR sensor as input
+    TRISB2 = 1;
+
+    // Buzzer as output  
+    TRISC0 = 0;  
+
+    // Laser diode as output
+    TRISC1 = 0;  
+    
+    // Clear PORTC
+    PORTC = 0x00;  
+
+    // Initialize UART for GSM
+    init_uart();  
+}
+
+void init_uart() {
+
+     // Baud rate for 9600 at 4MHz
+    SPBRG = 25;  
+
+    // TX enabled, BRGH = 1
+    TXSTA = 0x24;  
+
+    // Serial port enabled, continuous receive
+    RCSTA = 0x90;  
+}
+
+void send_sms(char* message) {
+
+    // Send SMS using GSM AT commands
+
+    // Set GSM module to Text Mode
+printf("AT+CMGF=1\r");  
+delay_ms(1000);
+
+    // Replace with the recipient's phone
+printf("AT+CMGS=\"+000000000000\"\r");   
+delay_ms(1000);
+
+    // Message to be sent
+printf("%s\r", message);  
+delay_ms(1000);
+
+    // CTRL+Z to send the message
+printf("%c", 26);  
+delay_ms(1000);
+}
+
+void lcd_init() {
+
+
+    // LCD initialization sequence
+
+    // Add LCD specific initialization here
+}
+
+void lcd_write(char *str) {
+     
+    // Write string to LCD display
+}
+
+void sensor_check() 
+
+// If PIR sensor detects motion
+
+{
+
+if (PIR_SENSOR == 1) 
+{  
+
+     // Send SMS with motion detected message
+     lcd_write("Motion Detected!");
+
+        // Activate buzzer
+     BUZZER = 1;  
+     send_sms("Alert! Motion detected.");
+} else 
+
+{
+        // Deactivate buzzer
+     BUZZER = 0;  
+}
+
+
+    // detects noise
+    if (SOUND_SENSOR == 1) 
+     {  
+     lcd_write("Sound Detected!");
+     BUZZER = 1;
+     send_sms("Alert! Sound detected.");
+} else {
+     BUZZER = 0;
+}
+
+
+     // If IR sensor detects an obstacle
+    if (IR_SENSOR == 1) 
+     {  
+        lcd_write("Intrusion Detected!");
+
+        // Activate laser diode
+        LASER_DIODE = 1;  
+        send_sms("Alert! Intrusion detected.");
+    } else {
+        LASER_DIODE = 0;
+    }
+}
+
+void delay_ms(unsigned int ms) {
+    // Simple delay function
+    while (ms--) {
+        __delay_ms(1);
+    }
+}
