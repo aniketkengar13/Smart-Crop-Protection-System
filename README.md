@@ -19,4 +19,4 @@ The **Smart Crop Protection System** is an automated solution designed to protec
 - The **LCD display** shows the type of event detected for local monitoring.
 - The **laser diode** can be used as a tripwire sensor that activates upon breaking the beam, signaling an intrusion.
 
-This system provides an efficient, real-time solution for protecting crops from both human and animal threats without requiring continuous human surveillance. By integrating GSM communication, the system ensures that the farmer is alerted instantly, even if they are far from the field, thus minimizing crop damage.
+
