@@ -1,0 +1,173 @@
+#include <xc.h>
+#include <stdio.h>
+#include <string.h>
+
+// Define PIC microcontroller configuration
+#pragma config FOSC = HS, CWDTCYL = ON, PWRTE = ON, BOREN = ON, WRT = OFF, CP = OFF, CPD = OFF, BORV = 3, LVP = ON
+
+// Define pin assignments
+#define GSM_TX RC6
+#define GSM_RX RC7
+#define BUZZER RC5
+#define PIR RC4
+#define IR_SENSOR RC3
+#define LCD_RS RC0
+#define LCD_EN RC1
+#define LCD_D4 RC2
+#define LCD_D5 RD0
+#define LCD_D6 RD1
+#define LCD_D7 RD2
+
+// Function prototypes
+void init_gsm();
+void send_sms(char *message);
+void init_lcd();
+void lcd_cmd(char cmd);
+void lcd_data(char data);
+void lcd_string(char *str);
+void init_pir();
+void init_ir_sensor();
+void init_buzzer();
+
+// Main function
+void main() {
+    // Initialize components
+    init_gsm();
+    init_lcd();
+    init_pir();
+    init_ir_sensor();
+    init_buzzer();
+
+    // Main loop
+    while (1) 
+
+{
+        // Check PIR sensor for motion detection
+        if (PIR == 1) 
+{
+
+            // Check IR sensor for pest presence
+            if (IR_SENSOR == 1) 
+{
+                // Pest detected, activate buzzer and send SMS
+                LATB |= (1 << BUZZER);
+                send_sms("Pest detected! Location: [Your location]");
+
+            }
+        }
+    }
+}
+
+// GSM module initialization
+
+void init_gsm()
+
+{
+    // Configure UART for GSM communication
+    TRISC |= (1 << GSM_RX);
+    TRISC &= ~(1 << GSM_TX);
+    TXSTA = 0x20;
+    RCSTA = 0x90;
+ // Set baud rate (adjust as needed)
+    BAUDCON = 0x08;
+
+    // Send AT commands to initialize GSM module
+    send_sms("AT");
+
+// Set message format to text
+    send_sms("AT+CMGF=1"); 
+
+// Configure SMS delivery
+    send_sms("AT+CNMI=2,1,0,0,0"); 
+}
+
+// Send SMS function
+
+void send_sms(char *message) 
+
+{
+    // Send AT command to send SMS
+    send_sms("AT+CMGS=\"[00000000000]\"\r\n");
+    send_sms(message);
+// Send CTRL+Z to terminate message
+    send_sms("\x1A"); 
+}
+
+// LCD display initialization
+void init_lcd() 
+{
+    // Configure LCD pins
+    TRISC |= (1 << LCD_RS) | (1 << LCD_EN) | (1 << LCD_D4) | (1 << LCD_D5) | (1 << LCD_D6) | (1 << LCD_D7);
+    TRISD |= (1 << LCD_D4) | (1 << LCD_D5) | (1 << LCD_D6) | (1 << LCD_D7);
+
+    // Send initialization commands
+// 4-bit mode
+    lcd_cmd(0x33); 
+// 4-bit mode
+    lcd_cmd(0x32); 
+// Display on, cursor off, blink off
+    lcd_cmd(0x0C); 
+// Increment cursor, no shift
+    lcd_cmd(0x06); 
+// Clear display
+    lcd_cmd(0x01); 
+}
+
+// LCD command function
+void lcd_cmd(char cmd) 
+
+{
+    LATC &= ~(1 << LCD_RS);
+    LATC |= (1 << LCD_EN);
+    LATD = (LATD & 0xF0) | (cmd & 0x0F);
+    LATC &= ~(1 << LCD_EN);
+    LATD = (LATD & 0xF0) | ((cmd >> 4) & 0x0F);
+    LATC |= (1 << LCD_EN);
+    LATC &= ~(1 << LCD_EN);
+}
+
+// LCD data function
+void lcd_data(char data)
+
+{
+    LATC |= (1 << LCD_RS);
+    LATC |= (1 << LCD_EN);
+    LATD = (LATD & 0xF0) | (data & 0x0F);
+    LATC &= ~(1 << LCD_EN);
+    LATD = (LATD & 0xF0) | ((data >> 4) & 0x0F);
+    LATC |= (1 << LCD_EN);
+    LATC &= ~(1 << LCD_EN);
+}
+
+// LCD string function
+void lcd_string(char *str) 
+
+{
+    while (*str) {
+        lcd_data(*str++);
+    }
+}
+
+// PIR sensor initialization
+void init_pir() 
+
+{
+    // Configure PIR sensor pin
+    TRISC &= ~(1 << PIR);
+}
+
+// IR sensor initialization
+void init_ir_sensor() 
+
+{
+    // Configure IR sensor pin
+    TRISC &= ~(1 << IR_SENSOR);
+}
+
+// Buzzer initialization
+void init_buzzer() 
+
+{
+    // Configure buzzer pin
+    TRISC &= ~(1 << BUZZER);
+}
