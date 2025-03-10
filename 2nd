@@ -30,19 +30,16 @@ void main(void) {
  // Initialize LCD
     lcd_init();     
 
-
 // Initialize GSM module
     gsm_init();         
 
  // Initialize PIR sensor
     pir_init();        
 
-
  // Initialize Buzzer
     buzzer_init();     
 
     while (1) {
-
 
         if (pir_detected())
 // Check if motion is detected
