@@ -2,53 +2,69 @@
 
 // Configuration Bits
 // Use your own config based on your hardware
+
 __CONFIG(0x1F7A);  
 
 // Define the ports/pins for sensors
 
 // connected to PORTB pin RB0
+
 #define PIR_SENSOR RB0  
 
 // connected to PORTB pin RB1
+
 #define SOUND_SENSOR RB1  
 
 //  connected to PORTB pin RB2
+
 #define IR_SENSOR RB2  
 
 //  to PORTC pin RC0
+
 #define BUZZER RC0  
 
 //  connected to PORTC pin RC1
+
 #define LASER DIODE RC1  
 
 // Define the GSM module interface (TX and RX)
 
 // UART TX for GSM
+
 #define GSM_TX RC6
 
 // UART RX for GSM  
+
 #define GSM_RX RC7  
 
 // Function Prototypes
+
 // Initialize system function
+
 void init_system();   
 
 // UART initialization
+
 void init_uart();   
 
 // Function to send SMS through GSM module
+
 void send_sms(char* message);  
 
 // LCD initialization
+
 void lcd_init(); 
 
 // Write data to LCD
+
 void lcd_write(char *str);  
 
 // Check sensors
+
 void sensor_check();  
 
 // Delay function
+
 void delay_ms(unsigned int ms);  
 
 void main() {
